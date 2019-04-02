@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Assignment</string>
+    <string name="please_wait">Please wait...</string>
+    <string name="search">Search...</string>
+    <string name="_4_columns">4 columns</string>
+    <string name="_3_columns">3 columns</string>
+    <string name="_2_columns">2 columns</string>
+</resources>
