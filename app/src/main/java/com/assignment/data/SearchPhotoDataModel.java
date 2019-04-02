@@ -45,7 +45,7 @@ public class SearchPhotoDataModel {
 		private String total;
 
 		@SerializedName("pages")
-		private String pages;
+		private int pages;
 
 		@SerializedName("photo")
 		private List<PhotoItem> photo;
@@ -69,11 +69,11 @@ public class SearchPhotoDataModel {
 			return total;
 		}
 
-		public void setPages(String pages){
+		public void setPages(int pages){
 			this.pages = pages;
 		}
 
-		public String getPages(){
+		public int getPages(){
 			return pages;
 		}
 
@@ -134,6 +134,8 @@ public class SearchPhotoDataModel {
 
 		@SerializedName("isfamily")
 		private int isfamily;
+
+		private String photoUrl;
 
 		public void setOwner(String owner){
 			this.owner = owner;
@@ -205,6 +207,14 @@ public class SearchPhotoDataModel {
 
 		public int getIsfamily(){
 			return isfamily;
+		}
+
+		public String getPhotoUrl() {
+			return photoUrl;
+		}
+
+		public void setPhotoUrl(String photoUrl) {
+			this.photoUrl = photoUrl;
 		}
 
 		@Override

@@ -37,18 +37,8 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
 
     @Override
     public void onBindViewHolder(@NonNull PhotoGalleryViewHolder photoGalleryViewHolder, int position) {
-
-        String url = "https://farm" +
-                mPhotoItems.get(position).getFarm() +
-                ".staticflickr.com/" +
-                mPhotoItems.get(position).getServer() +
-                "/" +
-                mPhotoItems.get(position).getId() +
-                "_" +
-                mPhotoItems.get(position).getSecret() +
-                "_z.jpg";
         Glide.with(mContext).
-                load(url)
+                load(mPhotoItems.get(position).getPhotoUrl())
                 .into(photoGalleryViewHolder.mSquareImageView);
 
         photoGalleryViewHolder.mSquareImageView.setOnClickListener(v -> {

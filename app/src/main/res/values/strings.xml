@@ -5,4 +5,8 @@
     <string name="_4_columns">4 columns</string>
     <string name="_3_columns">3 columns</string>
     <string name="_2_columns">2 columns</string>
+    <string name="nothing_to_display">Nothing to show !!\n Please search something...</string>
+    <string name="rationale_app_perm">Assignment app needs access to your internal storage for full functionality.</string>
+    <string name="setting">Setting</string>
+    <string name="cancel">Cancel</string>
 </resources>

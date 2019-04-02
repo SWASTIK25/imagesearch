@@ -1,5 +1,6 @@
 package com.assignment.presentation.actvities;
 
+import android.Manifest;
 import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
@@ -12,13 +13,16 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.assignment.R;
 import com.assignment.common.Constants;
@@ -28,6 +32,7 @@ import com.assignment.data.StatusData;
 import com.assignment.presentation.BaseActivity;
 import com.assignment.presentation.adapters.PhotoGalleryAdapter;
 import com.assignment.presentation.helpers.DialogUtils;
+import com.assignment.presentation.helpers.LogUtil;
 import com.assignment.presentation.viewmodels.MainViewModel;
 import com.google.gson.Gson;
 
@@ -38,10 +43,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import dagger.android.AndroidInjection;
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.AppSettingsDialog;
+import pub.devrel.easypermissions.EasyPermissions;
 
-public class MainActivity extends BaseActivity<MainViewModel> {
+public class MainActivity extends BaseActivity<MainViewModel> implements EasyPermissions.PermissionCallbacks {
     private Toolbar mToolbar;
     private EditText mSearchEditText;
+    private TextView mPlaceHolder;
     private RecyclerView mPhotoRecyclerView;
     private int mPageNum = 1;
     private final int ITEMS_PER_PAGE = 20;
@@ -49,7 +58,9 @@ public class MainActivity extends BaseActivity<MainViewModel> {
     private GridLayoutManager mGridLayoutManager;
     private PhotoGalleryAdapter mPhotoGalleryAdapter;
     private SwipeRefreshLayout mRefreshLayout;
-    private ImageView mBackImageView;
+    private ImageView mCrossImageView;
+    private static final int RC_SETTINGS_SCREEN_PERM = 123;
+    private static final int RC_FILE_STORAGE_APP_PERM = 124;
     @Inject
     @Named("mainViewModel")
     ViewModelProvider.Factory mFactory;
@@ -69,6 +80,7 @@ public class MainActivity extends BaseActivity<MainViewModel> {
     protected void initializeViews(Bundle bundle) {
         AndroidInjection.inject(this);
         mToolbar = findViewById(R.id.toolbar);
+        mPlaceHolder = findViewById(R.id.txt_empty);
         setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(false);
@@ -79,17 +91,25 @@ public class MainActivity extends BaseActivity<MainViewModel> {
         mSearchEditText = findViewById(R.id.et_search);
         mRefreshLayout = findViewById(R.id.refresh);
         mPhotoRecyclerView = findViewById(R.id.rv_image_gallery);
-        mBackImageView = findViewById(R.id.iv_back);
+        ImageView backImageView = findViewById(R.id.iv_back);
+        mCrossImageView = findViewById(R.id.iv_cross);
 
 
         mRefreshLayout.setOnRefreshListener(() -> {
             mRefreshLayout.setRefreshing(false);
         });
-        mBackImageView.setOnClickListener(v ->
+        backImageView.setOnClickListener(v ->
                 DialogUtils.doAlert(MainActivity.this
                         , "Do you want to exit?"
                         , "Yes"
                         , this::finish, "No", null));
+
+        mCrossImageView.setOnClickListener(v -> {
+            mSearchEditText.setText("");
+            mPhotoItems.clear();
+            mPhotoGalleryAdapter.notifyDataSetChanged();
+            mPlaceHolder.setVisibility(View.VISIBLE);
+        });
 
         doPhotoLoadingOnView();
     }
@@ -115,12 +135,10 @@ public class MainActivity extends BaseActivity<MainViewModel> {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if (s.toString().trim().length() >= 3) {
-                    mPageNum = 1;
-                    mRefreshLayout.setRefreshing(true);
-                    mSearchPhotoRequest.setText(s.toString().trim());
-                    mSearchPhotoRequest.setPage(mPageNum);
-                    getViewModel().search(mSearchPhotoRequest);
+                if (s.toString().trim().length() >= 1) {
+                    mCrossImageView.setVisibility(View.VISIBLE);
+                } else {
+                    mCrossImageView.setVisibility(View.GONE);
                 }
             }
 
@@ -128,6 +146,14 @@ public class MainActivity extends BaseActivity<MainViewModel> {
             public void afterTextChanged(Editable s) {
 
             }
+        });
+
+        mSearchEditText.setOnEditorActionListener((v, actionId, event) -> {
+
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                requestPermissionsAndGetPhotos();
+            }
+            return false;
         });
         mSearchPhotoRequest.setPageSize(ITEMS_PER_PAGE);
 
@@ -148,8 +174,64 @@ public class MainActivity extends BaseActivity<MainViewModel> {
 
             startActivity(intent, options.toBundle());
         });
+
+        if (mPhotoItems.size() < 1) {
+            mPlaceHolder.setVisibility(View.VISIBLE);
+        }
     }
 
+    @AfterPermissionGranted(RC_FILE_STORAGE_APP_PERM)
+    private void requestPermissionsAndGetPhotos() {
+
+        String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+            if (TextUtils.isEmpty(mSearchEditText.getText().toString().trim())) {
+                return;
+            }
+            mRefreshLayout.setEnabled(true);
+            if (!mRefreshLayout.isRefreshing()) {
+                mRefreshLayout.setRefreshing(true);
+            }
+
+            mPageNum = 1;
+            mRefreshLayout.setRefreshing(true);
+            mSearchPhotoRequest.setText(mSearchEditText.getText().toString().trim());
+            mSearchPhotoRequest.setPage(mPageNum);
+            getViewModel().search(mSearchPhotoRequest);
+        } else {
+            EasyPermissions.requestPermissions(this, getString(R.string.rationale_app_perm), RC_FILE_STORAGE_APP_PERM, perms);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        LogUtil.d(getClass().getName(), "onPermissionsGranted:" + requestCode + ":" + perms.size());
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        LogUtil.d(getClass().getName(), "onPermissionsDenied:" + requestCode + ":" + perms.size());
+
+        if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
+            new AppSettingsDialog.Builder(this)
+                    .setTitle(getString(R.string.title_settings_dialog))
+                    .setRationale(getString(R.string.rationale_ask_again))
+                    .setPositiveButton(getString(R.string.setting))
+                    .setNegativeButton(getString(R.string.cancel))
+                    .setRequestCode(RC_SETTINGS_SCREEN_PERM)
+                    .build()
+                    .show();
+            return;
+        }
+        this.finish();
+    }
     @Override
     protected void handleLiveData() {
         getViewModel().getPhotoSearchResponseData().observe(this, photoItems -> {
@@ -159,6 +241,7 @@ public class MainActivity extends BaseActivity<MainViewModel> {
                 mPhotoItems.clear();
             }
             if (photoItems != null && photoItems.getPhoto() != null) {
+                mPlaceHolder.setVisibility(View.GONE);
                 mPhotoItems.addAll(photoItems.getPhoto());
                 mPhotoGalleryAdapter.notifyDataSetChanged();
             }

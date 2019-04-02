@@ -38,7 +38,7 @@ public class PhotoViewerAdapter extends PagerAdapter {
     @Override
     public Object instantiateItem(@NonNull ViewGroup container, int position) {
         ImageView photoImageView = (ImageView) LayoutInflater.from(mContext).inflate(R.layout.layout_photo_viewer_item, container, false);
-        String url = "https://farm" +
+        /*String url = "https://farm" +
                 mPhotos.get(position).getFarm() +
                 ".staticflickr.com/" +
                 mPhotos.get(position).getServer() +
@@ -46,9 +46,9 @@ public class PhotoViewerAdapter extends PagerAdapter {
                 mPhotos.get(position).getId() +
                 "_" +
                 mPhotos.get(position).getSecret() +
-                "_z.jpg";
+                "_z.jpg";*/
         Glide.with(mContext).
-                load(url)
+                load(mPhotos.get(position).getPhotoUrl())
                 .into(photoImageView);
 
         container.addView(photoImageView);

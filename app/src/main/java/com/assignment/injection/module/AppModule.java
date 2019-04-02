@@ -1,5 +1,8 @@
 package com.assignment.injection.module;
 
+import android.content.Context;
+
+import com.assignment.common.AssignmentApp;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -20,7 +23,7 @@ public class AppModule {
     @Named("flickerApiKey")
     @Provides
     public String flickerApiKey() {
-        return "9e982e83f827b4249f27273f970a3be2";
+        return "3e1da1ab7062b54b4a63030b7630000d";
     }
 
     @Named("flickerSearchPhotoMethod")
@@ -30,4 +33,9 @@ public class AppModule {
     }
 
 
+    @Singleton
+    @Provides
+    public Context appContext() {
+        return AssignmentApp.getApplication();
+    }
 }
