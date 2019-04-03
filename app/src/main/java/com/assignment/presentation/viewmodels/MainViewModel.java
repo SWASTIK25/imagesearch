@@ -7,11 +7,10 @@ import com.assignment.data.SearchPhotoRequest;
 import com.assignment.data.StatusData;
 import com.assignment.domain.MainInteractors;
 import com.assignment.exceptions.ApiException;
+import com.assignment.presentation.helpers.IInternetStatus;
 import com.assignment.presentation.helpers.LogUtil;
 import com.assignment.presentation.viewmodels.common.BaseViewModel;
 import com.assignment.presentation.viewmodels.common.SingleLiveEvent;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -25,13 +24,15 @@ public class MainViewModel extends BaseViewModel {
     private MainInteractors.PhotoSearch mPhotoSearch;
     private CompositeDisposable mCompositeDisposable;
     private MutableLiveData<SearchPhotoDataModel.Photos> mPhotoSearchResponseLiveData =new MutableLiveData<>();
+    private IInternetStatus mInternetStatus;
 
     @Inject
-    protected MainViewModel(SingleLiveEvent<StatusData> singleLiveEvent, MainInteractors.PhotoSearch photoSearch) {
+    protected MainViewModel(SingleLiveEvent<StatusData> singleLiveEvent, MainInteractors.PhotoSearch photoSearch, IInternetStatus internetStatus) {
         super(singleLiveEvent);
         mSingleLiveEvent = singleLiveEvent;
         this.mCompositeDisposable = new CompositeDisposable();
         this.mPhotoSearch = photoSearch;
+        this.mInternetStatus = internetStatus;
     }
 
     public void search(SearchPhotoRequest searchPhotoRequest) {
@@ -48,6 +49,9 @@ public class MainViewModel extends BaseViewModel {
 
                         if (searchPhotoDataModel.getStat().equals("ok")) {
                             mPhotoSearchResponseLiveData.postValue(searchPhotoDataModel.getPhotos());
+                            if (mInternetStatus.isConnected()) {
+                                mPhotoSearch.storeDataLocally(searchPhotoRequest.getText(), searchPhotoDataModel).subscribe();
+                            }
                         } else {
                             StatusData status = new StatusData();
                             status.setStatus(StatusData.Status.FAIL);

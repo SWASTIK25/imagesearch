@@ -7,7 +7,6 @@ import android.util.Pair;
 import com.assignment.common.Constants;
 import com.assignment.data.apis.ApiServices;
 import com.assignment.data.database.DataSourceHelper;
-import com.assignment.exceptions.FileAlreadyExistException;
 import com.assignment.exceptions.NoDataException;
 import com.assignment.exceptions.NoMoreDataException;
 import com.assignment.presentation.helpers.AppFileUtils;
@@ -100,10 +99,6 @@ public class PhotoSearchRepository {
                         return Single.error(new NoDataException());
                     }
                 })
-                .map(searchPhotoDataModel -> {
-                    getFileInDirectoryAndStoreData(request.getText(), searchPhotoDataModel.getPhotos().getPhoto());
-                    return searchPhotoDataModel;
-                })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
@@ -115,11 +110,11 @@ public class PhotoSearchRepository {
      * @param queryName     name of search query
      * @param flickerPhotos photo object to fetch url from
      */
-    private void getFileInDirectoryAndStoreData(String queryName, List<SearchPhotoDataModel.PhotoItem> flickerPhotos) {
+    public Observable<Boolean> getFileInDirectoryAndStoreData(String queryName, List<SearchPhotoDataModel.PhotoItem> flickerPhotos) {
         if (flickerPhotos == null || flickerPhotos.size() == 0) {
-            return;
+            return null;
         }
-        Observable.fromIterable(flickerPhotos)
+        Observable<Boolean> observable = Observable.fromIterable(flickerPhotos)
                 .flatMap(photo -> {
                     //> Null checks
                     if (photo == null || photo.getPhotoUrl().isEmpty()) {
@@ -146,7 +141,10 @@ public class PhotoSearchRepository {
                     //> Store path in local database
                     mDataSource.insertData(queryName, stringStringPair.first, stringStringPair.second);
                     return true;
-                }).subscribe();
+                }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io());
+
+        return observable;
     }
 
     /**

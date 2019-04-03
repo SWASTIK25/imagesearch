@@ -27,5 +27,9 @@ public class MainInteractors {
         public Observable<SearchPhotoDataModel> getBehaviorStream(@NonNull SearchPhotoRequest searchPhotoRequest) {
             return mPhotoSearchRepository.searchPhotos(searchPhotoRequest).toObservable();
         }
+
+        public Observable<Boolean> storeDataLocally(@NonNull String query,SearchPhotoDataModel searchPhotoDataModel) {
+            return mPhotoSearchRepository.getFileInDirectoryAndStoreData(query, searchPhotoDataModel.getPhotos().getPhoto());
+        }
     }
 }

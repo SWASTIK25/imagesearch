@@ -28,7 +28,7 @@ public class PhotoViewerActivity extends BaseActivity {
     private TextView mPhotoCountTextView;
     private ViewPager mImageViewPager;
     private List<SearchPhotoDataModel.PhotoItem> mPhotos;
-    private int selectedPosition;
+    private int mSelectedPosition, mCurrentPosition;
 
     @Inject
     Gson gson;
@@ -54,12 +54,12 @@ public class PhotoViewerActivity extends BaseActivity {
         getDataFromIntent();
 
         if (mPhotos != null && mPhotos.size() != 0) {
-            String countOnTextView = selectedPosition + "/" + mPhotos.size();
+            String countOnTextView = mSelectedPosition + "/" + mPhotos.size();
             mPhotoCountTextView.setText(countOnTextView);
             PhotoViewerAdapter photoViewerAdapter = new PhotoViewerAdapter(this, mPhotos);
             mImageViewPager.setAdapter(photoViewerAdapter);
 
-            mImageViewPager.setCurrentItem(selectedPosition);
+            mImageViewPager.setCurrentItem(mSelectedPosition);
 
             mImageViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
                 @Override
@@ -69,6 +69,7 @@ public class PhotoViewerActivity extends BaseActivity {
 
                 @Override
                 public void onPageSelected(int i) {
+                    mCurrentPosition = i;
                     String countOnTextView = i + "/" + mPhotos.size();
                     mPhotoCountTextView.setText(countOnTextView);
                 }
@@ -87,12 +88,24 @@ public class PhotoViewerActivity extends BaseActivity {
         Type type = new TypeToken<ArrayList<SearchPhotoDataModel.PhotoItem>>() {
         }.getType();
         mPhotos = gson.fromJson(getIntent().getStringExtra(Constants.Extras.PHOTOS), type);
-        selectedPosition = getIntent().getIntExtra(Constants.Extras.SELECTED_POSITION, 0);
+        mSelectedPosition = getIntent().getIntExtra(Constants.Extras.SELECTED_POSITION, 0);
+        mCurrentPosition = mSelectedPosition;
     }
 
     @Override
     protected BaseViewModel initViewModel() {
         return null;
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        if (mSelectedPosition == mCurrentPosition){
+            super.onBackPressed();
+        }else {
+            finish();
+        }
+
     }
 
     @Override
