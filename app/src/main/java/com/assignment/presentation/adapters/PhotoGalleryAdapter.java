@@ -13,6 +13,7 @@ import com.assignment.common.interfaces.IRecyclerItemClicked;
 import com.assignment.data.SearchPhotoDataModel;
 import com.assignment.presentation.helpers.widget.SquareImageView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 
 import java.util.List;
 
@@ -22,10 +23,12 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
     private List<SearchPhotoDataModel.PhotoItem> mPhotoItems;
     private ILoadMore mLoadMoreListener;
     private IRecyclerItemClicked<SearchPhotoDataModel.PhotoItem> mRecyclerItemClicked;
+    private RequestManager mGlideRequestManager;
 
     public PhotoGalleryAdapter(Context mContext, List<SearchPhotoDataModel.PhotoItem> mPhotoItems) {
         this.mContext = mContext;
         this.mPhotoItems = mPhotoItems;
+        mGlideRequestManager = Glide.with(mContext);
     }
 
     @NonNull
@@ -37,8 +40,7 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
 
     @Override
     public void onBindViewHolder(@NonNull PhotoGalleryViewHolder photoGalleryViewHolder, int position) {
-        Glide.with(mContext).
-                load(mPhotoItems.get(position).getPhotoUrl())
+        mGlideRequestManager.load(mPhotoItems.get(position).getPhotoUrl()).placeholder(R.drawable.ic_placeholder).error(R.drawable.ic_error_outline_black_24dp)
                 .into(photoGalleryViewHolder.mSquareImageView);
 
         photoGalleryViewHolder.mSquareImageView.setOnClickListener(v -> {

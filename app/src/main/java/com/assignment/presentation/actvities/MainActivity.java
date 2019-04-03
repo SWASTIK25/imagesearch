@@ -32,6 +32,7 @@ import com.assignment.data.StatusData;
 import com.assignment.presentation.BaseActivity;
 import com.assignment.presentation.adapters.PhotoGalleryAdapter;
 import com.assignment.presentation.helpers.DialogUtils;
+import com.assignment.presentation.helpers.IInternetStatus;
 import com.assignment.presentation.helpers.LogUtil;
 import com.assignment.presentation.viewmodels.MainViewModel;
 import com.google.gson.Gson;
@@ -70,6 +71,9 @@ public class MainActivity extends BaseActivity<MainViewModel> implements EasyPer
 
     @Inject
     Gson mGson;
+
+    @Inject
+    IInternetStatus mInternetStatus;
 
     @Override
     protected int getLayoutId() {
@@ -158,10 +162,12 @@ public class MainActivity extends BaseActivity<MainViewModel> implements EasyPer
         mSearchPhotoRequest.setPageSize(ITEMS_PER_PAGE);
 
         mPhotoGalleryAdapter.setLoadMoreListener(() -> {
-            mPageNum++;
-            mRefreshLayout.setRefreshing(true);
-            mSearchPhotoRequest.setPage(mPageNum);
-            getViewModel().search(mSearchPhotoRequest);
+            if (mInternetStatus.isConnected()) {
+                mPageNum++;
+                mRefreshLayout.setRefreshing(true);
+                mSearchPhotoRequest.setPage(mPageNum);
+                getViewModel().search(mSearchPhotoRequest);
+            }
         });
 
         mPhotoGalleryAdapter.setRecyclerItemClicked((index, data, view) -> {
@@ -232,6 +238,7 @@ public class MainActivity extends BaseActivity<MainViewModel> implements EasyPer
         }
         this.finish();
     }
+
     @Override
     protected void handleLiveData() {
         getViewModel().getPhotoSearchResponseData().observe(this, photoItems -> {
