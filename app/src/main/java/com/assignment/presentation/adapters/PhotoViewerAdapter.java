@@ -11,17 +11,20 @@ import android.widget.ImageView;
 import com.assignment.R;
 import com.assignment.data.SearchPhotoDataModel;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.RequestManager;
 
 import java.util.List;
 
 public class PhotoViewerAdapter extends PagerAdapter {
 
+    private final RequestManager mGlideRequestManager;
     private Context mContext;
     private List<SearchPhotoDataModel.PhotoItem> mPhotos;
 
     public PhotoViewerAdapter(Context mContext, List<SearchPhotoDataModel.PhotoItem> mPhotos) {
         this.mContext = mContext;
         this.mPhotos = mPhotos;
+        mGlideRequestManager = Glide.with(mContext);
     }
 
     @Override
@@ -47,8 +50,8 @@ public class PhotoViewerAdapter extends PagerAdapter {
                 "_" +
                 mPhotos.get(position).getSecret() +
                 "_z.jpg";*/
-        Glide.with(mContext).
-                load(mPhotos.get(position).getPhotoUrl())
+        mGlideRequestManager.
+                load(mPhotos.get(position).getPhotoUrl()).placeholder(R.drawable.ic_placeholder).error(R.drawable.ic_error_outline_black_24dp)
                 .into(photoImageView);
 
         container.addView(photoImageView);

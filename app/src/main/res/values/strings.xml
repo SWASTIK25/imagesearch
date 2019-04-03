@@ -9,4 +9,6 @@
     <string name="rationale_app_perm">Assignment app needs access to your internal storage for full functionality.</string>
     <string name="setting">Setting</string>
     <string name="cancel">Cancel</string>
+    <string name="info_search_empty">Please add some text in search box</string>
+    <string name="no_data_found">No data found...</string>
 </resources>

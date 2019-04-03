@@ -23,6 +23,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.assignment.R;
 import com.assignment.common.Constants;
@@ -192,6 +193,7 @@ public class MainActivity extends BaseActivity<MainViewModel> implements EasyPer
         String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
         if (EasyPermissions.hasPermissions(this, perms)) {
             if (TextUtils.isEmpty(mSearchEditText.getText().toString().trim())) {
+                Toast.makeText(this, getString(R.string.info_search_empty), Toast.LENGTH_LONG).show();
                 return;
             }
             mRefreshLayout.setEnabled(true);
@@ -245,6 +247,9 @@ public class MainActivity extends BaseActivity<MainViewModel> implements EasyPer
             mRefreshLayout.setRefreshing(false);
 
             if (mPageNum == 1) {
+                if (photoItems != null && photoItems.getPhoto() != null && photoItems.getPhoto().size() == 0) {
+                    Toast.makeText(this, getString(R.string.no_data_found), Toast.LENGTH_SHORT).show();
+                }
                 mPhotoItems.clear();
             }
             if (photoItems != null && photoItems.getPhoto() != null) {

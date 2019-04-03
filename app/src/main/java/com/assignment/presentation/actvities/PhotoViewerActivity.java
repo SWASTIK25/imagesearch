@@ -54,7 +54,7 @@ public class PhotoViewerActivity extends BaseActivity {
         getDataFromIntent();
 
         if (mPhotos != null && mPhotos.size() != 0) {
-            String countOnTextView = mSelectedPosition + "/" + mPhotos.size();
+            String countOnTextView = mSelectedPosition+1 + "/" + mPhotos.size();
             mPhotoCountTextView.setText(countOnTextView);
             PhotoViewerAdapter photoViewerAdapter = new PhotoViewerAdapter(this, mPhotos);
             mImageViewPager.setAdapter(photoViewerAdapter);
@@ -69,7 +69,7 @@ public class PhotoViewerActivity extends BaseActivity {
 
                 @Override
                 public void onPageSelected(int i) {
-                    mCurrentPosition = i;
+                    mCurrentPosition = i+1;
                     String countOnTextView = i + "/" + mPhotos.size();
                     mPhotoCountTextView.setText(countOnTextView);
                 }
