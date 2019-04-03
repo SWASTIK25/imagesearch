@@ -50,7 +50,8 @@ public class MainViewModel extends BaseViewModel {
                         if (searchPhotoDataModel.getStat().equals("ok")) {
                             mPhotoSearchResponseLiveData.postValue(searchPhotoDataModel.getPhotos());
                             if (mInternetStatus.isConnected()) {
-                                mPhotoSearch.storeDataLocally(searchPhotoRequest.getText(), searchPhotoDataModel).subscribe();
+                                if (mPhotoSearch.storeDataLocally(searchPhotoRequest.getText(), searchPhotoDataModel) != null)
+                                    mPhotoSearch.storeDataLocally(searchPhotoRequest.getText(), searchPhotoDataModel).subscribe();
                             }
                         } else {
                             StatusData status = new StatusData();

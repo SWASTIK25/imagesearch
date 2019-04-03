@@ -6,7 +6,6 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,29 +17,48 @@ import com.assignment.exceptions.BaseException;
 import com.assignment.presentation.viewmodels.common.BaseViewModel;
 import com.assignment.presentation.viewmodels.common.SingleLiveEvent;
 
-import dagger.android.AndroidInjection;
-
 public abstract class BaseActivity<VM extends BaseViewModel> extends AppCompatActivity {
 
     private ProgressDialog mProgressBar;
     private VM mViewModel;
 
+    /**
+     * abstract impl provide layout which needs to be incorporated with current layout
+     *
+     * @return layout id
+     */
     protected abstract
     @LayoutRes
     int getLayoutId();
 
+    /**
+     * abstract impl for init layout view
+     */
     protected abstract void initializeViews(Bundle bundle);
 
+    /**
+     * current activity theme
+     *
+     * @return theme
+     */
     protected int getThemeOfActivity() {
         return R.style.AppTheme;
     }
 
-
+    /** abstract impl for init view model
+     * */
     protected abstract VM initViewModel();
 
+    /** abstract impl for handle success for request
+     * */
     protected abstract void handleViewModelUpdatesOnSuccess(StatusData status);
+
+    /** abstract impl for handling live data
+     * */
     protected abstract void handleLiveData();
 
+    /** abstract impl for handle failure for request
+     * */
     protected abstract void handleViewModelUpdatesOnFailure(StatusData status, Throwable throwable);
 
     @Override
@@ -62,6 +80,11 @@ public abstract class BaseActivity<VM extends BaseViewModel> extends AppCompatAc
     }
 
 
+    /**
+     * subscribe singleLiveEvent for knowing status of request
+     *
+     * @param singleLiveEvent : Single Live Data for updating status for request
+     */
     private void subscribeStatusEvent(SingleLiveEvent<StatusData> singleLiveEvent) {
         singleLiveEvent.observe(this, statusData -> {
             if (statusData != null && statusData.getStatus() != null) {
@@ -93,6 +116,8 @@ public abstract class BaseActivity<VM extends BaseViewModel> extends AppCompatAc
     }
 
 
+    /** Provide associated view model
+     * */
     @NonNull
     protected VM getViewModel() {
         return mViewModel;
