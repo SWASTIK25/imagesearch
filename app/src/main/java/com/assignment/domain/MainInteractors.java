@@ -1,6 +1,6 @@
 package com.assignment.domain;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.assignment.data.PhotoSearchRepository;
 import com.assignment.data.SearchPhotoDataModel;

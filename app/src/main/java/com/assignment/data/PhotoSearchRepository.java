@@ -6,7 +6,7 @@ import android.util.Pair;
 
 import com.assignment.common.Constants;
 import com.assignment.data.apis.ApiServices;
-import com.assignment.data.database.DataSourceHelper;
+import com.assignment.data.database.LocalDataHelper;
 import com.assignment.exceptions.NoDataException;
 import com.assignment.exceptions.NoMoreDataException;
 import com.assignment.presentation.helpers.AppFileUtils;
@@ -33,13 +33,13 @@ public class PhotoSearchRepository {
     private final AppFileUtils mAppFileUtils;
     private ApiServices mApiService;
     private IInternetStatus mInternetStatus;
-    private DataSourceHelper mDataSource;
+    private LocalDataHelper mDataSource;
     private Context mContext;
 
     @Inject
     public PhotoSearchRepository(Context context, @Named("RETROFIT_NORMAL") Retrofit retrofit
             , IInternetStatus internetStatus
-            , DataSourceHelper dataSourceHelper
+            , LocalDataHelper dataSourceHelper
             , AppFileUtils appFileUtils) {
         mApiService = retrofit.create(ApiServices.class);
         mInternetStatus = internetStatus;

@@ -1,6 +1,6 @@
 package com.assignment.presentation.viewmodels;
 
-import android.arch.lifecycle.MutableLiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.assignment.data.SearchPhotoDataModel;
 import com.assignment.data.SearchPhotoRequest;

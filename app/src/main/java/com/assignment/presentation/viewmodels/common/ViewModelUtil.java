@@ -1,18 +1,19 @@
 package com.assignment.presentation.viewmodels.common;
 
-import android.arch.lifecycle.ViewModel;
-import android.arch.lifecycle.ViewModelProvider;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import javax.inject.Inject;
 
 /**
- Creates a one off view model factory for the given view model instance.
+ * Creates a one off view model factory for the given view model instance.
  */
 public class ViewModelUtil {
 
     @Inject
-    public ViewModelUtil() {}
+    public ViewModelUtil() {
+    }
 
     public <T extends ViewModel> ViewModelProvider.Factory createFor(@NonNull final T viewModel) {
         return new ViewModelProvider.Factory() {

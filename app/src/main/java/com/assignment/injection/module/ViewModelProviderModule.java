@@ -1,10 +1,9 @@
 package com.assignment.injection.module;
 
-import android.arch.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.assignment.injection.scope.ActivityScope;
 import com.assignment.presentation.viewmodels.MainViewModel;
-import com.assignment.presentation.viewmodels.common.BaseViewModel;
 import com.assignment.presentation.viewmodels.common.ViewModelUtil;
 
 import javax.inject.Named;

@@ -1,6 +1,6 @@
 package com.assignment.presentation.viewmodels.common;
 
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModel;
 
 import com.assignment.data.StatusData;
 
