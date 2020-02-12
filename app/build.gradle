@@ -36,18 +36,25 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:2.0.0"
     implementation "androidx.lifecycle:lifecycle-viewmodel:2.0.0"
 
+    def room_version = "2.2.3"
+    //room dependency
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    androidTestImplementation "androidx.room:room-testing:$room_version"
+
+    //retrofit dependency
+    implementation "com.squareup.retrofit2:adapter-rxjava:${project.ext.retrofitRxAdapterVersion}"
+    implementation "com.squareup.retrofit2:retrofit:${project.ext.retrofitVersion}"
+    implementation "com.squareup.retrofit2:converter-gson:${project.ext.retrofitGsonVersion}"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:${project.ext.retrofitRxVersion}"
+
     implementation "com.google.dagger:dagger:${project.ext.daggerVersion}"
     implementation "com.google.dagger:dagger-android-support:${project.ext.daggerVersion}"
     annotationProcessor "com.google.dagger:dagger-compiler:${project.ext.daggerVersion}"
     annotationProcessor "com.google.dagger:dagger-android-processor:${project.ext.daggerVersion}"
     kapt "com.google.dagger:dagger-compiler:${project.ext.daggerVersion}"
     kapt "com.google.dagger:dagger-android-processor:${project.ext.daggerVersion}"
-
-    implementation "com.squareup.retrofit2:adapter-rxjava:${project.ext.retrofitRxAdapterVersion}"
-    implementation "com.squareup.retrofit2:retrofit:${project.ext.retrofitVersion}"
-    implementation "com.squareup.retrofit2:converter-gson:${project.ext.retrofitGsonVersion}"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:${project.ext.retrofitRxVersion}"
-
 
     implementation "com.github.bumptech.glide:glide:${project.ext.glideVersion}"
     annotationProcessor "com.github.bumptech.glide:compiler:${project.ext.glideVersion}"
@@ -61,7 +68,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-    implementation project(path: ':domain')
-    implementation project(path: ':framework')
 
 }
