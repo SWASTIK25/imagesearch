@@ -51,13 +51,13 @@ dependencies {
 
     implementation "com.google.dagger:dagger:${project.ext.daggerVersion}"
     implementation "com.google.dagger:dagger-android-support:${project.ext.daggerVersion}"
-    annotationProcessor "com.google.dagger:dagger-compiler:${project.ext.daggerVersion}"
-    annotationProcessor "com.google.dagger:dagger-android-processor:${project.ext.daggerVersion}"
+//    annotationProcessor "com.google.dagger:dagger-compiler:${project.ext.daggerVersion}"
+//    annotationProcessor "com.google.dagger:dagger-android-processor:${project.ext.daggerVersion}"
     kapt "com.google.dagger:dagger-compiler:${project.ext.daggerVersion}"
     kapt "com.google.dagger:dagger-android-processor:${project.ext.daggerVersion}"
 
     implementation "com.github.bumptech.glide:glide:${project.ext.glideVersion}"
-    annotationProcessor "com.github.bumptech.glide:compiler:${project.ext.glideVersion}"
+    //annotationProcessor "com.github.bumptech.glide:compiler:${project.ext.glideVersion}"
     kapt "com.github.bumptech.glide:compiler:${project.ext.glideVersion}"
 
     implementation "io.reactivex.rxjava2:rxjava:${project.ext.rxjavaVesion}"

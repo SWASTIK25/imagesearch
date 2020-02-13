@@ -46,7 +46,7 @@ constructor(private val mContext: Context, private val mInternetStatus: IInterne
                     .subscribeOn(Schedulers.computation())
                     .observeOn(AndroidSchedulers.mainThread())
         }
-        return mApiService!!.searchPhotos(request.method!!, request.apiKey!!, request.text!!, request.pageSize, request.page, request.format!!, request.noJsonCallback)
+        return mApiService.searchPhotos(request.method!!, request.apiKey!!, request.text!!, request.pageSize, request.page, request.format!!, request.noJsonCallback)
                 .flatMap(object : Function<SearchPhotoDataModel, SingleSource<out SearchPhotoDataModel>> {
 
                     @Throws(Exception::class)

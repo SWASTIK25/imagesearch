@@ -3,6 +3,7 @@ package com.assignment.injection.module
 
 import com.assignment.presentation.helpers.IInternetStatus
 import com.assignment.presentation.helpers.InternetStatusImpl
+import com.bumptech.glide.BuildConfig
 import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
@@ -80,7 +81,6 @@ class ApiModule {
     @Provides
     fun provideOkHttpClientWithAuthorization(@Named("loggingInterceptor") loggingInterceptor: Interceptor,
                                              @Named("networkTimeoutInSeconds") networkTimeoutInSeconds: Int,
-                                             @Named("isDebug") isDebug: Boolean,
                                              @Named("cacheInterceptor") cacheInterceptor: Interceptor,
                                              @Named("offlineInterceptor") offlineCacheInterceptor: Interceptor,
                                              @Named("retryInterceptor") retryInterceptor: Interceptor): OkHttpClient {
@@ -92,7 +92,7 @@ class ApiModule {
                 .connectTimeout(networkTimeoutInSeconds.toLong(), TimeUnit.SECONDS)
 
         //show logs if app is in Debug mode
-        if (isDebug) {
+        if (com.assignment.BuildConfig.DEBUG) {
             okHttpClient.addInterceptor(loggingInterceptor)
         }
 
