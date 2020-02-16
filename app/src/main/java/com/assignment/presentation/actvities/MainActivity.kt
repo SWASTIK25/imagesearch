@@ -12,20 +12,18 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityOptionsCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.assignment.BR
 import com.assignment.R
 import com.assignment.common.Constants
 import com.assignment.data.PhotoSearchRepository
+import com.assignment.databinding.ActivityMainBinding
 import com.assignment.domain.model.SearchPhotoRequest
 import com.assignment.presentation.BaseActivity
 import com.assignment.presentation.adapters.PhotoGalleryAdapter
@@ -40,25 +38,22 @@ import com.interfaces.ILoadMore
 import com.interfaces.IRecyclerItemClicked
 import com.model.PhotoItem
 import com.model.Photos
-import com.model.StatusData
 import dagger.android.AndroidInjection
+import kotlinx.android.synthetic.main.activity_full_screen.toolbar
+import kotlinx.android.synthetic.main.activity_main.*
 import pub.devrel.easypermissions.AfterPermissionGranted
 import pub.devrel.easypermissions.AppSettingsDialog
 import pub.devrel.easypermissions.EasyPermissions
 import javax.inject.Inject
 
-class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCallbacks {
-    private var mToolbar: Toolbar? = null
-    private var mSearchEditText: EditText? = null
-    private var mPlaceHolder: TextView? = null
-    private var mPhotoRecyclerView: RecyclerView? = null
+class MainActivity : BaseActivity<ActivityMainBinding,MainViewModel>(), EasyPermissions.PermissionCallbacks {
+
+
     private var mPageNum = 1
     private val mItemPerPage = 20
     private var mPhotoItems = mutableListOf<PhotoItem>()
     private var mGridLayoutManager: GridLayoutManager? = null
     private var mPhotoGalleryAdapter: PhotoGalleryAdapter? = null
-    private var mRefreshLayout: SwipeRefreshLayout? = null
-    private var mCrossImageView: ImageView? = null
 
     @Inject
     internal lateinit var mSearchPhotoRequest: SearchPhotoRequest
@@ -78,9 +73,9 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
     @Inject
     lateinit var mInternetStatus: IInternetStatus
 
-    override val layoutId: Int
-        get() = R.layout.activity_main
-
+    override fun getLayoutId(): Int {
+        return R.layout.activity_main
+    }
 
     override fun initViewModel(): MainViewModel {
         val viewModelFactory = ViewModelFactory(this.application,
@@ -88,25 +83,23 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
         return ViewModelProviders.of(this,viewModelFactory).get(MainViewModel::class.java)
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        handleLiveData()
+    }
     override fun initializeViews(bundle: Bundle?) {
         AndroidInjection.inject(this)
-        mToolbar = findViewById(R.id.toolbar)
-        mPlaceHolder = findViewById(R.id.txt_empty)
-        setSupportActionBar(mToolbar)
+        setSupportActionBar(toolbar)
         if (supportActionBar != null) {
             supportActionBar?.setDisplayHomeAsUpEnabled(false)
             supportActionBar?.setDisplayShowHomeEnabled(false)
             supportActionBar?.setTitle("")
         }
 
-        mSearchEditText = findViewById(R.id.et_search)
-        mRefreshLayout = findViewById(R.id.refresh)
-        mPhotoRecyclerView = findViewById(R.id.rv_image_gallery)
         val backImageView = findViewById<ImageView>(R.id.iv_back)
-        mCrossImageView = findViewById(R.id.iv_cross)
 
 
-        mRefreshLayout!!.setOnRefreshListener { mRefreshLayout!!.isRefreshing = false }
+        refresh?.setOnRefreshListener { refresh?.isRefreshing = false }
         backImageView.setOnClickListener {
 
             /*DialogUtils.doAlert(this@MainActivity,
@@ -114,27 +107,23 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
                     "Yes", { this.finish() }, "No", null)*/
         }
 
-        mCrossImageView!!.setOnClickListener { v ->
-            mSearchEditText!!.setText("")
+        iv_cross?.setOnClickListener { v ->
+            viewModel?.searchTxt?.set("")
             mPhotoItems.clear()
-            mPhotoGalleryAdapter!!.notifyDataSetChanged()
-            mPlaceHolder!!.visibility = View.VISIBLE
+            mPhotoGalleryAdapter?.notifyDataSetChanged()
+            viewModel?.isVisible?.set(true)
         }
 
         doPhotoLoadingOnView()
     }
-    override fun handleViewModelUpdatesOnSuccess(status: StatusData?) {
-    }
 
-    override fun handleViewModelUpdatesOnFailure(status: StatusData?, throwable: Throwable?) {
-    }
     private fun doPhotoLoadingOnView() {
         mGridLayoutManager = GridLayoutManager(this, 2)
-        mPhotoRecyclerView!!.layoutManager = mGridLayoutManager
+        rv_image_gallery?.layoutManager = mGridLayoutManager
         mPhotoGalleryAdapter = PhotoGalleryAdapter(this, mPhotoItems)
-        mPhotoRecyclerView!!.adapter = mPhotoGalleryAdapter
-        mPhotoRecyclerView!!.addItemDecoration(VerticalSpaceItemDecoration(3))
-        mSearchEditText!!.addTextChangedListener(object : TextWatcher {
+        rv_image_gallery?.adapter = mPhotoGalleryAdapter
+        rv_image_gallery?.addItemDecoration(VerticalSpaceItemDecoration(3))
+        et_search?.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
 
             }
@@ -142,9 +131,9 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
 
                 if (s.toString().trim { it <= ' ' }.length >= 1) {
-                    mCrossImageView!!.visibility = View.VISIBLE
+                    iv_cross?.visibility = View.VISIBLE
                 } else {
-                    mCrossImageView!!.visibility = View.GONE
+                    iv_cross?.visibility = View.GONE
                 }
             }
 
@@ -153,7 +142,7 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
             }
         })
 
-        mSearchEditText!!.setOnEditorActionListener { v, actionId, event ->
+        et_search?.setOnEditorActionListener { v, actionId, event ->
 
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 requestPermissionsAndGetPhotos()
@@ -166,7 +155,7 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
             override fun loadMore() {
                 if (mInternetStatus.isConnected) {
                     mPageNum++
-                    mRefreshLayout?.isRefreshing = true
+                    refresh?.isRefreshing = true
                     mSearchPhotoRequest.page = mPageNum
                     viewModel?.search(mSearchPhotoRequest)
                 }
@@ -185,27 +174,29 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
         })
 
         if (mPhotoItems.size < 1) {
-            mPlaceHolder?.visibility = View.VISIBLE
+            viewModel?.isVisible?.set(true)
         }
     }
-
+    override fun getBindingVariable(): Int {
+        return BR.viewmodel
+    }
     @AfterPermissionGranted(RC_FILE_STORAGE_APP_PERM)
     private fun requestPermissionsAndGetPhotos() {
 
         val perms = Manifest.permission.WRITE_EXTERNAL_STORAGE
         if (EasyPermissions.hasPermissions(this, perms)) {
-            if (TextUtils.isEmpty(mSearchEditText!!.text.toString().trim { it <= ' ' })) {
+            if (TextUtils.isEmpty(viewModel?.searchTxt?.get()?.trim { it <= ' ' })) {
                 Toast.makeText(this, getString(R.string.info_search_empty), Toast.LENGTH_LONG).show()
                 return
             }
-            mRefreshLayout?.isEnabled = true
-            if (!mRefreshLayout!!.isRefreshing) {
-                mRefreshLayout!!.isRefreshing = true
+            refresh?.isEnabled = true
+            if (refresh?.isRefreshing==false) {
+                refresh?.isRefreshing = true
             }
 
             mPageNum = 1
-            mRefreshLayout?.isRefreshing = true
-            mSearchPhotoRequest.text = mSearchEditText!!.text.toString().trim { it <= ' ' }
+            refresh?.isRefreshing = true
+            mSearchPhotoRequest.text = viewModel?.searchTxt?.get()?.trim { it <= ' ' }
             mSearchPhotoRequest.page = mPageNum
             viewModel?.search(mSearchPhotoRequest)
         } else {
@@ -240,10 +231,10 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
         this.finish()
     }
 
-    override fun handleLiveData() {
+    private fun handleLiveData() {
         viewModel?.photoSearchResponseData?.observe(this,object :Observer<Photos>{
             override fun onChanged(photoItems: Photos?) {
-                mRefreshLayout?.isRefreshing = false
+                refresh?.isRefreshing = false
                 photoItems?.photo.let {photoList->
                     photoList?.let {
                         if (mPageNum == 1) {
@@ -253,7 +244,7 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
                             mPhotoItems.clear()
                         }
                         if (photoItems?.photo != null) {
-                            mPlaceHolder?.visibility = View.GONE
+                            viewModel?.isVisible?.set(false)
                             mPhotoItems.addAll(it)
                             mPhotoGalleryAdapter?.notifyDataSetChanged()
                         }
@@ -267,18 +258,16 @@ class MainActivity : BaseActivity<MainViewModel>(), EasyPermissions.PermissionCa
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = getMenuInflater()
+        val inflater = menuInflater
         inflater.inflate(R.menu.menu_main_screen, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.two_columns) {
-            mGridLayoutManager!!.spanCount = 2
-        } else if (item.itemId == R.id.three_columns) {
-            mGridLayoutManager!!.spanCount = 3
-        } else if (item.itemId == R.id.four_columns) {
-            mGridLayoutManager!!.spanCount = 4
+        when {
+            item.itemId == R.id.two_columns -> mGridLayoutManager?.spanCount = 2
+            item.itemId == R.id.three_columns -> mGridLayoutManager?.spanCount = 3
+            item.itemId == R.id.four_columns -> mGridLayoutManager?.spanCount = 4
         }
         return super.onOptionsItemSelected(item)
     }

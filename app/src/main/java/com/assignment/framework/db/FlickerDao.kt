@@ -9,15 +9,15 @@ import androidx.room.Query
 interface FlickerDao {
 
     @Insert(onConflict = REPLACE)
-    suspend fun addImages(flicker: FlickerEntity)
+    fun addImages(flicker: FlickerEntity)
 
     @Query("SELECT * FROM flicker")
-    suspend fun getImagePaths(): List<FlickerEntity>
+    fun getImagePaths(): List<FlickerEntity>
 
     @Query("SELECT * FROM flicker WHERE `query` = :flickerQuery AND web_path =:webPath")
-    suspend fun getImagePath(flickerQuery: String, webPath: String): FlickerEntity
+    fun getImagePath(flickerQuery: String, webPath: String): FlickerEntity
 
     @Query("DELETE FROM flicker where `query`= :flickerQuery")
-    suspend fun removeImage(flickerQuery: String)
+    fun removeImage(flickerQuery: String)
 
 }

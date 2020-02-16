@@ -34,11 +34,9 @@ constructor(private val mContext: Context, private val mInternetStatus: IInterne
     lateinit var mApiService: ApiServices
 
     fun searchPhotos(request: SearchPhotoRequest): Single<SearchPhotoDataModel> {
-
-
-        //> From local store
+        //From local store
         if (!mInternetStatus.isConnected) {
-            //> Return all data in single page in case of offline
+            //Return all data in single page in case of offline
             if (request.page > 1) {
                 request.page = 1
             }
@@ -51,25 +49,22 @@ constructor(private val mContext: Context, private val mInternetStatus: IInterne
 
                     @Throws(Exception::class)
                     override fun apply(flickrObj: SearchPhotoDataModel): SingleSource<out SearchPhotoDataModel> {
-                        if (flickrObj == null) {
-                            return Single.error(NoDataException("Required data not available"))
-                        }
 
                         val (_, _, pages, photos, page) = flickrObj.photos
                                 ?: return Single.error(NoDataException("Required data not available"))
-//> If last page reached
+                     // If last page reached
                         if (page == pages) {
                             return Single.error(NoMoreDataException("Required data not available"))
                         }
                         if (photos != null) {
                             for (photo in photos) {
-                                //> Make url for Images and store it in same POJO
+                                // Make url for Images and store it in same POJO
                                 val url = String.format(Locale.getDefault(), "https://farm%d.staticflickr.com/%s/%s_%s_q.jpg",
                                         photo.farm, photo.server, photo.id, photo.secret)
                                 photo.photoUrl = url
                             }
 
-                            flickrObj.photos!!.photo = photos
+                            flickrObj.photos?.photo = photos
                             return Single.just(flickrObj)
                         }
                         return Single.error(NoDataException("Required data not available"))
@@ -93,24 +88,11 @@ constructor(private val mContext: Context, private val mInternetStatus: IInterne
             return Observable.error(NoDataException("No Data found"))
         } else Observable.fromIterable(flickerPhotos)
                 .flatMap { photo ->
-                    /* //> Null checks
-                     if (photo.photoUrl!!.isEmpty()) {
-                         //                        return Observable.error(new NoDataException());
-                     }
-                     //> Check if file has already been downloaded previously and exists in directory
-                     val localPath = mDataSource!!.getLocalImagePath(queryName, photo.photoUrl!!)
-                     if (!TextUtils.isEmpty(localPath)) {
-                         val file = File(localPath)
-                         if (file.exists()) {
-                             //                            return Observable.error(new FileAlreadyExistException());
-                         }
-                     }
-                     //> If doesn't exists, then proceed*/
                     Observable.just(photo)
                 }
                 .filter { !TextUtils.isEmpty(it.photoUrl) }
                 .map {
-                    //> get file from network and store it in destination path
+                    // get file from network and store it in destination path
                     val destinationFile = mAppFileUtils.createFileAt(mContext, it.title
                             ?: "temp", Constants.AppConstants.EXTENSION)
                     //TODO need to handle null value
@@ -118,7 +100,7 @@ constructor(private val mContext: Context, private val mInternetStatus: IInterne
                     Pair<String, String>(it.photoUrl, if (storedFile == null) "" else storedFile.getAbsolutePath())
                 }.map { stringStringPair ->
                     //> Store path in local database
-                    mDataSource?.insertData(queryName, stringStringPair.first, stringStringPair.second)
+                    mDataSource.insertData(queryName, stringStringPair.first, stringStringPair.second)
                     true
                 }.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
@@ -133,8 +115,8 @@ constructor(private val mContext: Context, private val mInternetStatus: IInterne
     private fun getLocallySavedDataObservable(searchString: String?): Single<SearchPhotoDataModel> {
         return Single.fromCallable {
             val list = ArrayList<PhotoItem>()
-            val pathList = mDataSource!!.getAllImagePaths(searchString!!)
-            if (pathList.size != 0) {
+            val pathList = mDataSource.getAllImagePaths(searchString!!)
+            if (pathList.isNotEmpty()) {
                 for (localPath in pathList) {
                     val photoItem = PhotoItem()
                     photoItem.photoUrl = localPath

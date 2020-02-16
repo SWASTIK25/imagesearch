@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+        <variable
+            name="viewmodel"
+            type="com.assignment.presentation.viewmodels.PhotoViewerModel" />
+    </data>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
@@ -26,6 +33,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
                 android:padding="@dimen/large_padding"
+                android:text="@{viewmodel.currentPage}"
                 android:textColor="@color/color_blue" />
         </androidx.appcompat.widget.Toolbar>
 
@@ -38,3 +46,4 @@
         android:transitionName="photo" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

@@ -2,6 +2,7 @@ package com.assignment.presentation.viewmodels
 
 import android.app.Application
 import android.util.Log
+import androidx.databinding.ObservableField
 import androidx.lifecycle.MutableLiveData
 import com.assignment.domain.model.SearchPhotoRequest
 import com.assignment.exceptions.ApiException
@@ -20,6 +21,8 @@ class MainViewModel constructor(application: Application,
                                 private var intractors: Intractors, private val mSingleLiveEvent: SingleLiveEvent<StatusData>, private val mInternetStatus: IInternetStatus) : BaseViewModel(application,intractors,mSingleLiveEvent,mInternetStatus) {
     private val mCompositeDisposable: CompositeDisposable?
     val photoSearchResponseData = MutableLiveData<Photos>()
+    val searchTxt = ObservableField<String>()
+    val isVisible = ObservableField<Boolean>()
 
     init {
         this.mCompositeDisposable = CompositeDisposable()
